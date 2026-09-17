@@ -10,19 +10,19 @@
     },
     "beta": {
       "windows": {
-        "version": "0.9.12-rc",
+        "version": "0.9.13-rc",
         "published": true,
-        "artifact": "TEMNO-Windows-0.9.12-rc-win-x64-portable.zip",
-        "size": 108063277,
-        "sha256": "3e3e3df51b97893bd5b1011d3d17f7e348e1db27ab459028f8f41acc1079f448",
-        "url": "https://github.com/ChekovDanil/temno-vpn-releases/releases/download/windows-v0.9.12-rc/TEMNO-Windows-0.9.12-rc-win-x64-portable.zip",
+        "artifact": "TEMNO-Windows-0.9.13-rc-win-x64-portable.zip",
+        "size": 108064858,
+        "sha256": "31f1f19c595f13e64f2da8ddd634d6f6a5007e19e12e9f0014303277b057eb5e",
+        "url": "https://github.com/ChekovDanil/temno-vpn-releases/releases/download/windows-v0.9.13-rc/TEMNO-Windows-0.9.13-rc-win-x64-portable.zip",
         "signed": false,
         "automaticUpdate": false,
         "installer": {
-          "artifact": "TEMNO-VPN-0.9.12-rc-win-x64-setup-unsigned-test.exe",
-          "url": "https://github.com/ChekovDanil/temno-vpn-releases/releases/download/windows-v0.9.12-rc/TEMNO-VPN-0.9.12-rc-win-x64-setup-unsigned-test.exe",
-          "size": 75263989,
-          "sha256": "4c8d26b47f6ba4cb860663cee92efda7714eb1331f9f0af498082b389816a7c5",
+          "artifact": "TEMNO-VPN-0.9.13-rc-win-x64-setup-unsigned-test.exe",
+          "url": "https://github.com/ChekovDanil/temno-vpn-releases/releases/download/windows-v0.9.13-rc/TEMNO-VPN-0.9.13-rc-win-x64-setup-unsigned-test.exe",
+          "size": 104682853,
+          "sha256": "4ffe586b7d6b50cae7735e09717d35f7e6e6f4fa19168a4bc5b587991bf9ed04",
           "signed": false,
           "status": "test"
         }

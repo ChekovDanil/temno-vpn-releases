@@ -1,0 +1,2 @@
+31f1f19c595f13e64f2da8ddd634d6f6a5007e19e12e9f0014303277b057eb5e  TEMNO-Windows-0.9.13-rc-win-x64-portable.zip
+4ffe586b7d6b50cae7735e09717d35f7e6e6f4fa19168a4bc5b587991bf9ed04  TEMNO-VPN-0.9.13-rc-win-x64-setup-unsigned-test.exe
