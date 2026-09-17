@@ -8,4 +8,5 @@
 *.pem
 secrets/
 artifacts/
-
+__pycache__/
+*.py[cod]
