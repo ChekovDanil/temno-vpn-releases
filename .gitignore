@@ -1,0 +1,11 @@
+*.pfx
+*.p12
+*.jks
+*.keystore
+*.mobileprovision
+*.cer
+*.key
+*.pem
+secrets/
+artifacts/
+
