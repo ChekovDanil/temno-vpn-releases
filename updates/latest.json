@@ -13,12 +13,12 @@
     },
     "beta": {
       "windows": {
-        "version": "0.9.5-rc",
+        "version": "0.9.6-rc",
         "published": false,
-        "artifact": "TEMNO-Windows-0.9.5-rc-win-x64-portable.zip",
-        "size": 105246680,
-        "sha256": "0b417d2b92180a28b6abe98fd32f4ff352741f95e205c598bb3422abbfd5fc0b",
-        "url": "https://github.com/ChekovDanil/temno-vpn-releases/releases/download/windows-v0.9.5-rc/TEMNO-Windows-0.9.5-rc-win-x64-portable.zip",
+        "artifact": "TEMNO-Windows-0.9.6-rc-win-x64-portable.zip",
+        "size": 105248225,
+        "sha256": "290aa3dd5ee579c6251e81b69e76cccc2a292bfb5bc847484e4b69c28c92d529",
+        "url": "https://github.com/ChekovDanil/temno-vpn-releases/releases/download/windows-v0.9.6-rc/TEMNO-Windows-0.9.6-rc-win-x64-portable.zip",
         "signed": false,
         "automaticUpdate": false
       },
