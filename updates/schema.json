@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ChekovDanil/temno-vpn-releases/raw/main/updates/schema.json",
+  "title": "TEMNO VPN update catalog",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "product", "channels"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "product": { "const": "TEMNO VPN" },
+    "channels": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stable", "beta"],
+      "properties": {
+        "stable": { "$ref": "#/$defs/channel" },
+        "beta": { "$ref": "#/$defs/channel" }
+      }
+    }
+  },
+  "$defs": {
+    "channel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["windows", "android", "macos", "ios"],
+      "properties": {
+        "windows": { "anyOf": [{ "type": "null" }, { "$ref": "#/$defs/build" }] },
+        "android": { "anyOf": [{ "type": "null" }, { "$ref": "#/$defs/build" }] },
+        "macos": { "anyOf": [{ "type": "null" }, { "$ref": "#/$defs/build" }] },
+        "ios": { "anyOf": [{ "type": "null" }, { "type": "object" }] }
+      }
+    },
+    "build": {
+      "type": "object",
+      "required": ["version", "published", "automaticUpdate"],
+      "properties": {
+        "version": { "type": "string", "minLength": 1, "maxLength": 40 },
+        "published": { "type": "boolean" },
+        "automaticUpdate": { "type": "boolean" },
+        "artifact": { "type": "string" },
+        "url": { "type": "string", "format": "uri", "pattern": "^https://github\.com/ChekovDanil/temno-vpn-releases/releases/download/" },
+        "size": { "type": "integer", "minimum": 1 },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "signed": { "type": "boolean" },
+        "buildType": { "type": "string" }
+      }
+    }
+  }
+}
