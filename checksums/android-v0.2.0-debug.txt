@@ -1,0 +1,3 @@
+303d95fd52fdc2f9e0046646cc090b7934d4f65d1c9bfb41ff9aef40ee3ffe3c  TEMNO-VPN-Android-0.2.0-arm64-v8a-debug.apk
+25ccbbfcbd8daa9e1273bba114627afaac8cac6f94dea94e34913a491d7c5600  TEMNO-VPN-Android-0.2.0-armeabi-v7a-debug.apk
+b6fc26c1373192280f59562c16b0385d6decdf8083551a90c0b9a58b0f634e92  TEMNO-VPN-Android-0.2.0-x86_64-debug.apk
