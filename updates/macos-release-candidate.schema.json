@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TEMNO direct macOS release candidate",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion", "product", "platform", "status", "published",
+    "automaticUpdate", "version", "build", "sourceCommit", "minimumOS",
+    "distribution", "signed", "notarized", "stapled", "teamId", "systemExtension", "artifacts"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "product": { "const": "TEMNO VPN" },
+    "platform": { "const": "macos" },
+    "status": { "const": "candidate" },
+    "published": { "const": false },
+    "automaticUpdate": { "const": false },
+    "version": { "type": "string", "minLength": 1, "maxLength": 40 },
+    "build": { "type": "string", "pattern": "^[1-9][0-9]*$" },
+    "sourceCommit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "minimumOS": { "const": "14.0" },
+    "distribution": { "const": "developer-id" },
+    "signed": { "const": true },
+    "notarized": { "const": true },
+    "stapled": { "const": true },
+    "teamId": { "type": "string", "pattern": "^[A-Z0-9]{10}$" },
+    "systemExtension": { "const": "com.temnovpn.app.macos.PacketTunnelSystemExtension" },
+    "artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["format", "artifact", "size", "sha256", "url"],
+        "properties": {
+          "format": { "enum": ["dmg", "pkg"] },
+          "artifact": { "type": "string", "minLength": 1 },
+          "size": { "type": "integer", "minimum": 1 },
+          "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "url": { "type": ["string", "null"], "format": "uri" }
+        }
+      }
+    }
+  }
+}

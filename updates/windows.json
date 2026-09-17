@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "product": "TEMNO VPN",
+  "platform": "windows",
+  "channels": {
+    "stable": null,
+    "beta": {
+      "version": "0.9.12-rc",
+      "published": true,
+      "artifact": "TEMNO-Windows-0.9.12-rc-win-x64-portable.zip",
+      "size": 108063277,
+      "sha256": "3e3e3df51b97893bd5b1011d3d17f7e348e1db27ab459028f8f41acc1079f448",
+      "url": "https://github.com/ChekovDanil/temno-vpn-releases/releases/download/windows-v0.9.12-rc/TEMNO-Windows-0.9.12-rc-win-x64-portable.zip",
+      "signed": false,
+      "automaticUpdate": false,
+      "installer": {
+        "artifact": "TEMNO-VPN-0.9.12-rc-win-x64-setup-unsigned-test.exe",
+        "url": "https://github.com/ChekovDanil/temno-vpn-releases/releases/download/windows-v0.9.12-rc/TEMNO-VPN-0.9.12-rc-win-x64-setup-unsigned-test.exe",
+        "size": 75263989,
+        "sha256": "4c8d26b47f6ba4cb860663cee92efda7714eb1331f9f0af498082b389816a7c5",
+        "signed": false,
+        "status": "test"
+      }
+    },
+    "internal": null
+  }
+}

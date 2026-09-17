@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "product": "TEMNO VPN",
+  "platform": "android",
+  "channels": {
+    "stable": null,
+    "beta": null,
+    "internal": {
+      "version": "0.2.0",
+      "published": false,
+      "buildType": "debug",
+      "localOnly": true,
+      "automaticUpdate": false
+    }
+  }
+}

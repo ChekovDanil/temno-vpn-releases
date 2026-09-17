@@ -6,10 +6,7 @@
       "windows": null,
       "android": null,
       "macos": null,
-      "ios": {
-        "status": "development",
-        "distribution": "app-store"
-      }
+      "ios": null
     },
     "beta": {
       "windows": {
@@ -30,14 +27,35 @@
           "status": "test"
         }
       },
+      "android": null,
+      "macos": null,
+      "ios": null
+    },
+    "internal": {
+      "windows": null,
       "android": {
         "version": "0.2.0",
         "published": false,
         "buildType": "debug",
+        "localOnly": true,
         "automaticUpdate": false
       },
-      "macos": null,
-      "ios": null
+      "macos": {
+        "version": "0.1.0",
+        "published": false,
+        "status": "scaffold",
+        "distribution": "developer-id",
+        "localOnly": true,
+        "automaticUpdate": false
+      },
+      "ios": {
+        "version": "0.1.0",
+        "published": false,
+        "status": "development",
+        "distribution": "app-store",
+        "localOnly": true,
+        "automaticUpdate": false
+      }
     }
   }
 }

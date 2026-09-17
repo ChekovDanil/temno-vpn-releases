@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "product": "TEMNO VPN",
+  "platform": "ios",
+  "channels": {
+    "stable": null,
+    "beta": null,
+    "internal": {
+      "version": "0.1.0",
+      "published": false,
+      "status": "development",
+      "distribution": "app-store",
+      "localOnly": true,
+      "automaticUpdate": false
+    }
+  }
+}

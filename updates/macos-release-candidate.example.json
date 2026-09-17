@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "product": "TEMNO VPN",
+  "platform": "macos",
+  "status": "candidate",
+  "published": false,
+  "automaticUpdate": false,
+  "version": "0.1.0",
+  "build": "1",
+  "sourceCommit": "0000000000000000000000000000000000000000",
+  "minimumOS": "14.0",
+  "distribution": "developer-id",
+  "signed": true,
+  "notarized": true,
+  "stapled": true,
+  "teamId": "REPLACE123",
+  "systemExtension": "com.temnovpn.app.macos.PacketTunnelSystemExtension",
+  "artifacts": [
+    {
+      "format": "dmg",
+      "artifact": "TEMNO-VPN-0.1.0-macos-universal.dmg",
+      "size": 1,
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "url": null
+    }
+  ]
+}
