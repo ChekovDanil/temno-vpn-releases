@@ -1,0 +1,1 @@
+0b417d2b92180a28b6abe98fd32f4ff352741f95e205c598bb3422abbfd5fc0b  TEMNO-Windows-0.9.5-rc-win-x64-portable.zip
