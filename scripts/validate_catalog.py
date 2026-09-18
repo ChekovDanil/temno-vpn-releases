@@ -8,7 +8,9 @@ import json
 import re
 import sys
 from pathlib import Path
-from urllib.parse import unquote, urlsplit
+from urllib.error import HTTPError, URLError
+from urllib.parse import quote, unquote, urlsplit
+from urllib.request import Request, urlopen
 
 PLATFORMS = ("windows", "android", "macos", "ios")
 CHANNELS = ("stable", "beta", "internal")
@@ -18,6 +20,7 @@ SHA256 = re.compile(r"^[0-9a-f]{64}$")
 SAFE_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 SAFE_TAG = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 ANDROID_ABIS = ("arm64-v8a", "armeabi-v7a", "x86_64")
+AUTOMATIC_UPDATES_SUPPORTED = False
 
 
 class CatalogError(ValueError):
@@ -38,7 +41,7 @@ def load_json(path: Path) -> dict:
     return value
 
 
-def validate_url(value: object, artifact: str, path: str) -> None:
+def validate_url(value: object, artifact: str, path: str) -> str:
     if not isinstance(value, str):
         fail(path, "URL must be a string")
     parsed = urlsplit(value)
@@ -55,6 +58,7 @@ def validate_url(value: object, artifact: str, path: str) -> None:
     tag, filename = match.groups()
     if tag.lower() == "latest" or filename != artifact:
         fail(path, "URL tag must be immutable and its filename must equal artifact")
+    return tag
 
 
 def validate_release_page(value: object, tag: str, path: str) -> None:
@@ -73,7 +77,7 @@ def validate_release_page(value: object, tag: str, path: str) -> None:
         fail(path, "release page must point to the matching immutable GitHub tag")
 
 
-def validate_artifact(item: object, path: str, *, require_signed: bool = False) -> None:
+def validate_artifact(item: object, path: str, *, require_signed: bool = False) -> str:
     if not isinstance(item, dict):
         fail(path, "artifact metadata must be an object")
     required = ("artifact", "url", "size", "sha256", "signed")
@@ -91,7 +95,7 @@ def validate_artifact(item: object, path: str, *, require_signed: bool = False) 
         fail(f"{path}.signed", "must be a boolean")
     if require_signed and not item["signed"]:
         fail(f"{path}.signed", "stable artifacts must be signed")
-    validate_url(item["url"], artifact, f"{path}.url")
+    return validate_url(item["url"], artifact, f"{path}.url")
 
 
 def validate_android_variants(item: dict, path: str) -> None:
@@ -102,7 +106,7 @@ def validate_android_variants(item: dict, path: str) -> None:
     seen_artifacts: set[str] = set()
     for index, variant in enumerate(variants):
         variant_path = f"{path}.variants[{index}]"
-        validate_artifact(variant, variant_path, require_signed=True)
+        variant_tag = validate_artifact(variant, variant_path, require_signed=True)
         abi = variant.get("abi") if isinstance(variant, dict) else None
         if abi not in ANDROID_ABIS:
             fail(f"{variant_path}.abi", "unsupported Android ABI")
@@ -112,7 +116,7 @@ def validate_android_variants(item: dict, path: str) -> None:
             fail(f"{variant_path}.artifact", "duplicate Android artifact")
         if not variant["artifact"].lower().endswith(".apk"):
             fail(f"{variant_path}.artifact", "Android variant must be an APK")
-        if f"/releases/download/{item.get('tag')}/" not in variant["url"]:
+        if variant_tag != item.get("tag"):
             fail(f"{variant_path}.url", "Android variant tag must match release tag")
         seen_abis.add(abi)
         seen_artifacts.add(variant["artifact"])
@@ -125,7 +129,9 @@ def validate_android_variants(item: dict, path: str) -> None:
 def validate_handoff(item: object, path: str) -> None:
     if not isinstance(item, dict):
         fail(path, "handoff metadata must be an object")
-    required = ("published", "prerelease", "tag", "releasePage", "artifact", "url", "size", "sha256", "type")
+    required = (
+        "published", "prerelease", "tag", "releasePage", "artifact", "url", "size", "sha256", "type",
+    )
     missing = [key for key in required if key not in item]
     if missing:
         fail(path, f"missing fields: {', '.join(missing)}")
@@ -144,8 +150,8 @@ def validate_handoff(item: object, path: str) -> None:
         fail(f"{path}.size", "must be a positive integer")
     if not isinstance(item["sha256"], str) or not SHA256.fullmatch(item["sha256"]):
         fail(f"{path}.sha256", "must be a lowercase SHA-256")
-    validate_url(item["url"], artifact, f"{path}.url")
-    if f"/releases/download/{tag}/" not in item["url"]:
+    asset_tag = validate_url(item["url"], artifact, f"{path}.url")
+    if asset_tag != tag:
         fail(f"{path}.url", "handoff asset tag must match handoff tag")
 
 
@@ -161,6 +167,8 @@ def validate_release(item: object, platform: str, channel: str, path: str) -> No
         fail(f"{path}.version", "invalid semantic release version")
     if not isinstance(item["published"], bool) or not isinstance(item["automaticUpdate"], bool):
         fail(path, "published and automaticUpdate must be booleans")
+    if item["automaticUpdate"] and not AUTOMATIC_UPDATES_SUPPORTED:
+        fail(f"{path}.automaticUpdate", "automatic updates remain disabled until catalog and artifact signatures are verified by clients")
 
     if channel == "internal":
         if item["published"] or item["automaticUpdate"]:
@@ -193,7 +201,10 @@ def validate_release(item: object, platform: str, channel: str, path: str) -> No
             fail(path, "published iOS release needs an App Store or TestFlight URL")
         return
 
-    validate_artifact(item, path, require_signed=(channel == "stable"))
+    asset_tag = validate_artifact(item, path, require_signed=(channel == "stable"))
+    expected_tag = f"{platform}-v{item['version']}"
+    if asset_tag != expected_tag:
+        fail(f"{path}.url", f"asset tag must be {expected_tag}")
     artifact = item["artifact"].lower()
     if platform == "windows" and not artifact.endswith((".exe", ".zip", ".msix")):
         fail(f"{path}.artifact", "Windows artifact must be EXE, ZIP or MSIX")
@@ -217,7 +228,7 @@ def validate_release(item: object, platform: str, channel: str, path: str) -> No
         if item["minimumSdk"] < 1 or item["targetSdk"] < item["minimumSdk"]:
             fail(path, "Android SDK bounds are invalid")
         validate_release_page(item.get("releasePage"), tag, f"{path}.releasePage")
-        if f"/releases/download/{tag}/" not in item["url"]:
+        if tag != asset_tag:
             fail(f"{path}.url", "Android asset tag must match release tag")
         validate_android_variants(item, path)
     if platform == "macos":
@@ -228,7 +239,9 @@ def validate_release(item: object, platform: str, channel: str, path: str) -> No
     if item["automaticUpdate"] and (channel != "stable" or not item.get("signed")):
         fail(path, "automatic updates require a signed stable release")
     if "installer" in item:
-        validate_artifact(item["installer"], f"{path}.installer", require_signed=(channel == "stable"))
+        installer_tag = validate_artifact(item["installer"], f"{path}.installer", require_signed=(channel == "stable"))
+        if installer_tag != asset_tag:
+            fail(f"{path}.installer.url", "installer and primary artifact must use the same release tag")
 
 
 def checksum_entries(root: Path) -> dict[str, str]:
@@ -246,6 +259,72 @@ def checksum_entries(root: Path) -> dict[str, str]:
                 fail(str(checksum_file), f"conflicting checksum for {artifact}")
             result[artifact] = digest
     return result
+
+
+def live_expectations(root: Path) -> dict[str, dict]:
+    """Collect release assets that the catalog claims are already published."""
+    latest = load_json(root / "updates" / "latest.json")
+    result: dict[str, dict] = {}
+
+    def add(tag: str, prerelease: bool, artifact: dict) -> None:
+        release = result.setdefault(tag, {"prerelease": prerelease, "assets": {}})
+        if release["prerelease"] != prerelease:
+            fail(f"live.{tag}", "one tag cannot be both a release and a prerelease")
+        release["assets"][artifact["artifact"]] = {
+            "size": artifact["size"],
+            "sha256": artifact["sha256"],
+        }
+
+    channels = latest["channels"]
+    for channel in ("stable", "beta"):
+        for platform in PLATFORMS:
+            item = channels[channel][platform]
+            if not isinstance(item, dict) or not item.get("published") or "artifact" not in item:
+                continue
+            tag = validate_url(item["url"], item["artifact"], f"live.{channel}.{platform}.url")
+            add(tag, channel == "beta", item)
+            if isinstance(item.get("installer"), dict):
+                add(tag, channel == "beta", item["installer"])
+            for variant in item.get("variants", []):
+                add(tag, channel == "beta", variant)
+
+    for platform in ("macos", "ios"):
+        item = channels["internal"][platform]
+        handoff = item.get("handoff") if isinstance(item, dict) else None
+        if isinstance(handoff, dict) and handoff.get("published"):
+            add(handoff["tag"], True, handoff)
+    return result
+
+
+def audit_live_releases(root: Path) -> None:
+    """Verify published catalog claims against GitHub without downloading assets."""
+    for tag, expected in live_expectations(root).items():
+        api_url = f"https://api.github.com/repos/{REPOSITORY}/releases/tags/{quote(tag, safe='')}"
+        request = Request(
+            api_url,
+            headers={"Accept": "application/vnd.github+json", "User-Agent": "temno-release-catalog-audit"},
+        )
+        try:
+            with urlopen(request, timeout=20) as response:
+                release = json.load(response)
+        except HTTPError as error:
+            fail(f"live.{tag}", f"GitHub release lookup returned HTTP {error.code}")
+        except (URLError, TimeoutError, OSError, json.JSONDecodeError) as error:
+            fail(f"live.{tag}", f"GitHub release lookup failed: {error}")
+        if release.get("draft") is not False:
+            fail(f"live.{tag}", "cataloged release is still a draft")
+        if release.get("prerelease") is not expected["prerelease"]:
+            fail(f"live.{tag}", "GitHub prerelease state differs from the catalog channel")
+        assets = {asset.get("name"): asset for asset in release.get("assets", [])}
+        for artifact, metadata in expected["assets"].items():
+            remote = assets.get(artifact)
+            if not isinstance(remote, dict) or remote.get("state") != "uploaded":
+                fail(f"live.{tag}.{artifact}", "cataloged asset is missing or not uploaded")
+            if remote.get("size") != metadata["size"]:
+                fail(f"live.{tag}.{artifact}", "GitHub asset size differs from the catalog")
+            digest = remote.get("digest")
+            if digest is not None and digest != f"sha256:{metadata['sha256']}":
+                fail(f"live.{tag}.{artifact}", "GitHub asset SHA-256 differs from the catalog")
 
 
 def validate(root: Path) -> None:
@@ -302,13 +381,18 @@ def validate(root: Path) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
+    parser.add_argument("--live", action="store_true", help="also verify published tags and assets through the GitHub API")
     args = parser.parse_args()
     try:
-        validate(args.root.resolve())
+        root = args.root.resolve()
+        validate(root)
+        if args.live:
+            audit_live_releases(root)
     except CatalogError as error:
         print(f"ERROR: {error}", file=sys.stderr)
         return 1
-    print("PASS: release catalog, platform manifests, immutable URLs and checksums are consistent")
+    scope = " and live GitHub releases" if args.live else ""
+    print(f"PASS: release catalog, platform manifests, immutable URLs and checksums{scope} are consistent")
     return 0
 
 

@@ -40,6 +40,21 @@ class ReleaseCatalogTests(unittest.TestCase):
         item["url"] = "https://github.com/ChekovDanil/temno-vpn-releases/releases/download/latest/" + item["artifact"]
         self.assertRejected(item, "windows")
 
+    def test_expiring_or_signed_query_url_is_rejected(self):
+        item = copy.deepcopy(self.latest["channels"]["beta"]["windows"])
+        item["url"] += "?X-Amz-Expires=300"
+        self.assertRejected(item, "windows")
+
+    def test_release_tag_must_match_platform_and_version(self):
+        item = copy.deepcopy(self.latest["channels"]["beta"]["windows"])
+        item["url"] = item["url"].replace("windows-v0.9.14-rc", "windows-v0.9.13-rc")
+        self.assertRejected(item, "windows")
+
+    def test_installer_cannot_come_from_another_release_tag(self):
+        item = copy.deepcopy(self.latest["channels"]["beta"]["windows"])
+        item["installer"]["url"] = item["installer"]["url"].replace("windows-v0.9.14-rc", "windows-v0.9.13-rc")
+        self.assertRejected(item, "windows")
+
     def test_unsigned_windows_cannot_enter_stable(self):
         item = copy.deepcopy(self.latest["channels"]["beta"]["windows"])
         with self.assertRaises(catalog.CatalogError):
@@ -49,6 +64,14 @@ class ReleaseCatalogTests(unittest.TestCase):
         item = copy.deepcopy(self.latest["channels"]["beta"]["windows"])
         item["automaticUpdate"] = True
         self.assertRejected(item, "windows")
+
+    def test_automatic_install_remains_disabled_even_for_signed_stable(self):
+        item = copy.deepcopy(self.latest["channels"]["beta"]["windows"])
+        item["signed"] = True
+        item["installer"]["signed"] = True
+        item["installer"]["status"] = "ready"
+        item["automaticUpdate"] = True
+        self.assertRejected(item, "windows", "stable")
 
     def test_internal_entries_cannot_expose_downloads(self):
         item = copy.deepcopy(self.latest["channels"]["internal"]["macos"])
@@ -92,6 +115,13 @@ class ReleaseCatalogTests(unittest.TestCase):
             self.assertFalse(item["vpnReady"])
             self.assertFalse(item["physicalDeviceTested"])
             self.assertEqual(item["handoff"]["type"], "source-handoff")
+            self.assertEqual(item["handoff"]["tag"], "apple-handoff-v0.4-internal")
+
+    def test_documentation_preserves_gaming_platform_boundary(self):
+        readme = (ROOT / "README.md").read_text(encoding="utf-8")
+        self.assertIn("Игровой режим доступен только в Windows", readme)
+        self.assertIn("На Android, iOS и iPadOS он не входит", readme)
+        self.assertIn("для macOS это лишь возможный отдельный будущий этап", readme)
 
     def test_apple_handoff_cannot_claim_vpn_readiness(self):
         item = copy.deepcopy(self.latest["channels"]["internal"]["macos"])

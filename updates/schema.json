@@ -38,7 +38,7 @@
         "version": { "type": "string", "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-(?:alpha|beta|rc)(?:\\.(0|[1-9][0-9]*))?)?$", "maxLength": 40 },
         "published": { "type": "boolean" },
         "prerelease": { "type": "boolean" },
-        "automaticUpdate": { "type": "boolean" },
+        "automaticUpdate": { "const": false },
         "tag": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$" },
         "releasePage": { "type": "string", "format": "uri", "pattern": "^https://github\\.com/ChekovDanil/temno-vpn-releases/releases/tag/" },
         "artifact": { "type": "string", "minLength": 1 },
