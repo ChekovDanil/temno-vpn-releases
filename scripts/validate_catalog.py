@@ -16,6 +16,8 @@ REPOSITORY = "ChekovDanil/temno-vpn-releases"
 VERSION = re.compile(r"^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(?:-(?:alpha|beta|rc)(?:\.(0|[1-9][0-9]*))?)?$")
 SHA256 = re.compile(r"^[0-9a-f]{64}$")
 SAFE_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
+SAFE_TAG = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
+ANDROID_ABIS = ("arm64-v8a", "armeabi-v7a", "x86_64")
 
 
 class CatalogError(ValueError):
@@ -55,6 +57,22 @@ def validate_url(value: object, artifact: str, path: str) -> None:
         fail(path, "URL tag must be immutable and its filename must equal artifact")
 
 
+def validate_release_page(value: object, tag: str, path: str) -> None:
+    if not isinstance(value, str):
+        fail(path, "release page must be a string")
+    parsed = urlsplit(value)
+    expected = f"/{REPOSITORY}/releases/tag/{tag}"
+    if (
+        parsed.scheme != "https"
+        or parsed.netloc != "github.com"
+        or parsed.query
+        or parsed.fragment
+        or unquote(parsed.path) != parsed.path
+        or parsed.path != expected
+    ):
+        fail(path, "release page must point to the matching immutable GitHub tag")
+
+
 def validate_artifact(item: object, path: str, *, require_signed: bool = False) -> None:
     if not isinstance(item, dict):
         fail(path, "artifact metadata must be an object")
@@ -76,6 +94,61 @@ def validate_artifact(item: object, path: str, *, require_signed: bool = False) 
     validate_url(item["url"], artifact, f"{path}.url")
 
 
+def validate_android_variants(item: dict, path: str) -> None:
+    variants = item.get("variants")
+    if not isinstance(variants, list) or not variants:
+        fail(f"{path}.variants", "published Android releases need at least one ABI variant")
+    seen_abis: set[str] = set()
+    seen_artifacts: set[str] = set()
+    for index, variant in enumerate(variants):
+        variant_path = f"{path}.variants[{index}]"
+        validate_artifact(variant, variant_path, require_signed=True)
+        abi = variant.get("abi") if isinstance(variant, dict) else None
+        if abi not in ANDROID_ABIS:
+            fail(f"{variant_path}.abi", "unsupported Android ABI")
+        if abi in seen_abis:
+            fail(f"{variant_path}.abi", "duplicate Android ABI")
+        if variant["artifact"] in seen_artifacts:
+            fail(f"{variant_path}.artifact", "duplicate Android artifact")
+        if not variant["artifact"].lower().endswith(".apk"):
+            fail(f"{variant_path}.artifact", "Android variant must be an APK")
+        if f"/releases/download/{item.get('tag')}/" not in variant["url"]:
+            fail(f"{variant_path}.url", "Android variant tag must match release tag")
+        seen_abis.add(abi)
+        seen_artifacts.add(variant["artifact"])
+    if seen_abis != set(ANDROID_ABIS):
+        fail(f"{path}.variants", "published Android candidate must list every released ABI exactly once")
+    if item.get("artifact") not in seen_artifacts:
+        fail(f"{path}.artifact", "primary Android artifact must also appear in variants")
+
+
+def validate_handoff(item: object, path: str) -> None:
+    if not isinstance(item, dict):
+        fail(path, "handoff metadata must be an object")
+    required = ("published", "prerelease", "tag", "releasePage", "artifact", "url", "size", "sha256", "type")
+    missing = [key for key in required if key not in item]
+    if missing:
+        fail(path, f"missing fields: {', '.join(missing)}")
+    if item["published"] is not True or item["prerelease"] is not True:
+        fail(path, "handoff must describe a published prerelease")
+    if item["type"] != "source-handoff":
+        fail(f"{path}.type", "only source handoff archives are allowed")
+    tag = item["tag"]
+    if not isinstance(tag, str) or not SAFE_TAG.fullmatch(tag) or not tag.endswith("-internal"):
+        fail(f"{path}.tag", "handoff tag must be an immutable internal tag")
+    validate_release_page(item["releasePage"], tag, f"{path}.releasePage")
+    artifact = item["artifact"]
+    if not isinstance(artifact, str) or not SAFE_NAME.fullmatch(artifact) or not artifact.lower().endswith(".zip"):
+        fail(f"{path}.artifact", "handoff artifact must be a safe ZIP archive")
+    if not isinstance(item["size"], int) or isinstance(item["size"], bool) or item["size"] < 1:
+        fail(f"{path}.size", "must be a positive integer")
+    if not isinstance(item["sha256"], str) or not SHA256.fullmatch(item["sha256"]):
+        fail(f"{path}.sha256", "must be a lowercase SHA-256")
+    validate_url(item["url"], artifact, f"{path}.url")
+    if f"/releases/download/{tag}/" not in item["url"]:
+        fail(f"{path}.url", "handoff asset tag must match handoff tag")
+
+
 def validate_release(item: object, platform: str, channel: str, path: str) -> None:
     if item is None:
         return
@@ -90,11 +163,19 @@ def validate_release(item: object, platform: str, channel: str, path: str) -> No
         fail(path, "published and automaticUpdate must be booleans")
 
     if channel == "internal":
-        if item["published"] or item["automaticUpdate"] or item.get("localOnly") is not True:
-            fail(path, "internal entries must be unpublished, local-only and non-automatic")
+        if item["published"] or item["automaticUpdate"]:
+            fail(path, "internal app entries must be unpublished and non-automatic")
         forbidden = {"artifact", "url", "size", "sha256", "installer", "storeUrl"}.intersection(item)
         if forbidden:
             fail(path, f"internal metadata cannot expose distributable fields: {', '.join(sorted(forbidden))}")
+        if item.get("status") == "handoff":
+            validate_handoff(item.get("handoff"), f"{path}.handoff")
+            if item.get("vpnReady") is not False or item.get("physicalDeviceTested") is not False:
+                fail(path, "Apple handoff must explicitly state that VPN and physical-device readiness are false")
+        elif "handoff" in item:
+            fail(f"{path}.handoff", "handoff metadata requires handoff status")
+        elif item.get("localOnly") is not True:
+            fail(path, "non-handoff internal entries must be local-only")
         return
 
     if not item["published"]:
@@ -119,6 +200,26 @@ def validate_release(item: object, platform: str, channel: str, path: str) -> No
     if platform == "android":
         if item.get("buildType") != "release" or not item.get("signed") or not artifact.endswith(".apk"):
             fail(path, "public Android artifact must be a signed release APK")
+        if channel == "beta":
+            if item.get("prerelease") is not True or item.get("status") != "candidate":
+                fail(path, "Android beta must be marked as a release candidate prerelease")
+            if item.get("physicalDeviceTested") is not False:
+                fail(path, "current Android candidate must truthfully record missing physical-device validation")
+        elif item.get("physicalDeviceTested") is not True:
+            fail(path, "stable Android releases require physical-device validation")
+        tag = item.get("tag")
+        if not isinstance(tag, str) or not SAFE_TAG.fullmatch(tag):
+            fail(f"{path}.tag", "published Android candidate needs an immutable tag")
+        if not isinstance(item.get("certificateSha256"), str) or not SHA256.fullmatch(item["certificateSha256"]):
+            fail(f"{path}.certificateSha256", "published Android candidate needs its signing-certificate SHA-256")
+        if not isinstance(item.get("minimumSdk"), int) or not isinstance(item.get("targetSdk"), int):
+            fail(path, "published Android candidate needs numeric minimumSdk and targetSdk")
+        if item["minimumSdk"] < 1 or item["targetSdk"] < item["minimumSdk"]:
+            fail(path, "Android SDK bounds are invalid")
+        validate_release_page(item.get("releasePage"), tag, f"{path}.releasePage")
+        if f"/releases/download/{tag}/" not in item["url"]:
+            fail(f"{path}.url", "Android asset tag must match release tag")
+        validate_android_variants(item, path)
     if platform == "macos":
         if not artifact.endswith((".dmg", ".pkg")):
             fail(f"{path}.artifact", "macOS artifact must be DMG or PKG")
@@ -174,6 +275,19 @@ def validate(root: Path) -> None:
                 artifact = artifact_item["artifact"]
                 if checksums.get(artifact) != artifact_item["sha256"]:
                     fail(f"channels.{channel}.{platform}", f"checksum file is missing or differs for {artifact}")
+            if platform == "android" and isinstance(item.get("variants"), list):
+                for variant in item["variants"]:
+                    artifact = variant["artifact"]
+                    if checksums.get(artifact) != variant["sha256"]:
+                        fail(f"channels.{channel}.{platform}", f"checksum file is missing or differs for {artifact}")
+
+    for platform in ("macos", "ios"):
+        item = channels["internal"][platform]
+        if isinstance(item, dict) and isinstance(item.get("handoff"), dict):
+            handoff = item["handoff"]
+            artifact = handoff["artifact"]
+            if checksums.get(artifact) != handoff["sha256"]:
+                fail(f"channels.internal.{platform}.handoff", f"checksum file is missing or differs for {artifact}")
 
     for platform in PLATFORMS:
         manifest = load_json(updates / f"{platform}.json")

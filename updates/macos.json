@@ -6,12 +6,24 @@
     "stable": null,
     "beta": null,
     "internal": {
-      "version": "0.1.0",
+      "version": "0.4.0",
       "published": false,
-      "status": "scaffold",
+      "status": "handoff",
       "distribution": "developer-id",
-      "localOnly": true,
-      "automaticUpdate": false
+      "automaticUpdate": false,
+      "vpnReady": false,
+      "physicalDeviceTested": false,
+      "handoff": {
+        "published": true,
+        "prerelease": true,
+        "type": "source-handoff",
+        "tag": "apple-handoff-v0.4-internal",
+        "releasePage": "https://github.com/ChekovDanil/temno-vpn-releases/releases/tag/apple-handoff-v0.4-internal",
+        "artifact": "TEMNO-Apple-Handoff-0.4.zip",
+        "size": 4699733,
+        "sha256": "62dde33587ee0f4cdd50c52c0bb6d3694182a3f1ece50536748f74f8960fbb2a",
+        "url": "https://github.com/ChekovDanil/temno-vpn-releases/releases/download/apple-handoff-v0.4-internal/TEMNO-Apple-Handoff-0.4.zip"
+      }
     }
   }
 }

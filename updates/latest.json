@@ -27,34 +27,97 @@
           "status": "test"
         }
       },
-      "android": null,
+      "android": {
+        "version": "0.2.0-rc",
+        "published": true,
+        "prerelease": true,
+        "status": "candidate",
+        "distribution": "github-release",
+        "tag": "android-v0.2.0-rc",
+        "releasePage": "https://github.com/ChekovDanil/temno-vpn-releases/releases/tag/android-v0.2.0-rc",
+        "buildType": "release",
+        "artifact": "TEMNO-Android-0.2.0-rc-arm64-v8a.apk",
+        "size": 95786754,
+        "sha256": "ce7a37f7559912358b2aa1e54120ba7a5139f01d461eacb4b05a6726bc73ac6d",
+        "url": "https://github.com/ChekovDanil/temno-vpn-releases/releases/download/android-v0.2.0-rc/TEMNO-Android-0.2.0-rc-arm64-v8a.apk",
+        "signed": true,
+        "automaticUpdate": false,
+        "physicalDeviceTested": false,
+        "minimumSdk": 26,
+        "targetSdk": 36,
+        "certificateSha256": "52459db2493a6bd704809298fb3f755a0fd9c9fd2bf1b57af96b07e46c8489e4",
+        "variants": [
+          {
+            "abi": "arm64-v8a",
+            "artifact": "TEMNO-Android-0.2.0-rc-arm64-v8a.apk",
+            "size": 95786754,
+            "sha256": "ce7a37f7559912358b2aa1e54120ba7a5139f01d461eacb4b05a6726bc73ac6d",
+            "url": "https://github.com/ChekovDanil/temno-vpn-releases/releases/download/android-v0.2.0-rc/TEMNO-Android-0.2.0-rc-arm64-v8a.apk",
+            "signed": true
+          },
+          {
+            "abi": "armeabi-v7a",
+            "artifact": "TEMNO-Android-0.2.0-rc-armeabi-v7a.apk",
+            "size": 87771324,
+            "sha256": "f86c4852e5245e361aa3d61e1ee207d3285510a4b48a03681d53d8da88f3c5d7",
+            "url": "https://github.com/ChekovDanil/temno-vpn-releases/releases/download/android-v0.2.0-rc/TEMNO-Android-0.2.0-rc-armeabi-v7a.apk",
+            "signed": true
+          },
+          {
+            "abi": "x86_64",
+            "artifact": "TEMNO-Android-0.2.0-rc-x86_64.apk",
+            "size": 100168303,
+            "sha256": "05aaa7f2af3d73d0ac9b625f89310ef51a66312137536e43aba0cae7d3c40302",
+            "url": "https://github.com/ChekovDanil/temno-vpn-releases/releases/download/android-v0.2.0-rc/TEMNO-Android-0.2.0-rc-x86_64.apk",
+            "signed": true
+          }
+        ]
+      },
       "macos": null,
       "ios": null
     },
     "internal": {
       "windows": null,
-      "android": {
-        "version": "0.2.0",
-        "published": false,
-        "buildType": "debug",
-        "localOnly": true,
-        "automaticUpdate": false
-      },
+      "android": null,
       "macos": {
-        "version": "0.1.0",
+        "version": "0.4.0",
         "published": false,
-        "status": "scaffold",
+        "status": "handoff",
         "distribution": "developer-id",
-        "localOnly": true,
-        "automaticUpdate": false
+        "automaticUpdate": false,
+        "vpnReady": false,
+        "physicalDeviceTested": false,
+        "handoff": {
+          "published": true,
+          "prerelease": true,
+          "type": "source-handoff",
+          "tag": "apple-handoff-v0.4-internal",
+          "releasePage": "https://github.com/ChekovDanil/temno-vpn-releases/releases/tag/apple-handoff-v0.4-internal",
+          "artifact": "TEMNO-Apple-Handoff-0.4.zip",
+          "size": 4699733,
+          "sha256": "62dde33587ee0f4cdd50c52c0bb6d3694182a3f1ece50536748f74f8960fbb2a",
+          "url": "https://github.com/ChekovDanil/temno-vpn-releases/releases/download/apple-handoff-v0.4-internal/TEMNO-Apple-Handoff-0.4.zip"
+        }
       },
       "ios": {
-        "version": "0.1.0",
+        "version": "0.4.0",
         "published": false,
-        "status": "development",
+        "status": "handoff",
         "distribution": "app-store",
-        "localOnly": true,
-        "automaticUpdate": false
+        "automaticUpdate": false,
+        "vpnReady": false,
+        "physicalDeviceTested": false,
+        "handoff": {
+          "published": true,
+          "prerelease": true,
+          "type": "source-handoff",
+          "tag": "apple-handoff-v0.4-internal",
+          "releasePage": "https://github.com/ChekovDanil/temno-vpn-releases/releases/tag/apple-handoff-v0.4-internal",
+          "artifact": "TEMNO-Apple-Handoff-0.4.zip",
+          "size": 4699733,
+          "sha256": "62dde33587ee0f4cdd50c52c0bb6d3694182a3f1ece50536748f74f8960fbb2a",
+          "url": "https://github.com/ChekovDanil/temno-vpn-releases/releases/download/apple-handoff-v0.4-internal/TEMNO-Apple-Handoff-0.4.zip"
+        }
       }
     }
   }

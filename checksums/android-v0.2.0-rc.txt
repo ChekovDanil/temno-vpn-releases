@@ -1,0 +1,3 @@
+ce7a37f7559912358b2aa1e54120ba7a5139f01d461eacb4b05a6726bc73ac6d  TEMNO-Android-0.2.0-rc-arm64-v8a.apk
+f86c4852e5245e361aa3d61e1ee207d3285510a4b48a03681d53d8da88f3c5d7  TEMNO-Android-0.2.0-rc-armeabi-v7a.apk
+05aaa7f2af3d73d0ac9b625f89310ef51a66312137536e43aba0cae7d3c40302  TEMNO-Android-0.2.0-rc-x86_64.apk

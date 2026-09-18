@@ -18,9 +18,12 @@
 - [ ] Windows stable: Authenticode проверен на чистой Windows.
 - [ ] Android: build type `release`, APK/AAB подписан production keystore.
 - [ ] Android debug не загружен в GitHub Releases.
+- [ ] Android prerelease без проверки на физическом устройстве имеет
+  `physicalDeviceTested=false` и `automaticUpdate=false`.
 - [ ] iOS/iPadOS: TestFlight/App Store, публичного IPA нет.
 - [ ] macOS: Developer ID, Hardened Runtime, notarization и stapling проверены.
 - [ ] macOS: Gatekeeper запускает DMG/PKG без обходных команд.
+- [ ] Apple handoff содержит только исходники и не обозначен как готовый VPN,
+  IPA, DMG или PKG.
 - [ ] `automaticUpdate=true` используется только для подписанного stable-релиза
   после внедрения проверки подписи каталога и файла в клиенте.
-
