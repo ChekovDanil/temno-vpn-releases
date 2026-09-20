@@ -47,12 +47,12 @@ class ReleaseCatalogTests(unittest.TestCase):
 
     def test_release_tag_must_match_platform_and_version(self):
         item = copy.deepcopy(self.latest["channels"]["beta"]["windows"])
-        item["url"] = item["url"].replace("windows-v0.9.14-rc", "windows-v0.9.13-rc")
+        item["url"] = item["url"].replace("windows-v0.9.16-rc", "windows-v0.9.15-rc")
         self.assertRejected(item, "windows")
 
     def test_installer_cannot_come_from_another_release_tag(self):
         item = copy.deepcopy(self.latest["channels"]["beta"]["windows"])
-        item["installer"]["url"] = item["installer"]["url"].replace("windows-v0.9.14-rc", "windows-v0.9.13-rc")
+        item["installer"]["url"] = item["installer"]["url"].replace("windows-v0.9.16-rc", "windows-v0.9.15-rc")
         self.assertRejected(item, "windows")
 
     def test_unsigned_windows_cannot_enter_stable(self):

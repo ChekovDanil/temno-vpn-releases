@@ -7,12 +7,12 @@
 
 | Платформа | Канал | Состояние |
 | --- | --- | --- |
-| Windows | beta | 0.9.14 RC: portable ZIP и тестовый неподписанный установщик |
+| Windows | beta | 0.9.16 RC: portable ZIP и тестовый неподписанный установщик |
 | Android | beta | 0.2.0 RC: три подписанных APK, ручная установка, без автообновления |
 | iOS/iPadOS | internal | опубликован пакет исходников 0.4 для проверки интерфейса; готового VPN/IPA нет |
 | macOS | internal | опубликован пакет исходников 0.4 для проверки интерфейса; готового DMG/VPN нет |
 
-[Windows 0.9.14 RC](https://github.com/ChekovDanil/temno-vpn-releases/releases/tag/windows-v0.9.14-rc)
+[Windows 0.9.16 RC](https://github.com/ChekovDanil/temno-vpn-releases/releases/tag/windows-v0.9.16-rc)
 предназначен для тестирования. Он не считается стабильным выпуском и не
 устанавливается автоматически.
 
