@@ -104,7 +104,7 @@ class ReleaseCatalogTests(unittest.TestCase):
 
     def test_android_variant_cannot_point_to_another_tag(self):
         item = copy.deepcopy(self.latest["channels"]["beta"]["android"])
-        item["variants"][0]["url"] = item["variants"][0]["url"].replace("android-v0.2.0-rc", "android-v0.2.1-rc")
+        item["variants"][0]["url"] = item["variants"][0]["url"].replace(item["tag"], "android-v0.0.0-other")
         self.assertRejected(item, "android")
 
     def test_apple_handoff_is_not_an_application_release(self):
