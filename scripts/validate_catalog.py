@@ -20,6 +20,7 @@ SHA256 = re.compile(r"^[0-9a-f]{64}$")
 SAFE_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 SAFE_TAG = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 ANDROID_ABIS = ("arm64-v8a", "armeabi-v7a", "x86_64")
+ANDROID_OPTIONAL_ABIS = ("universal",)
 AUTOMATIC_UPDATES_SUPPORTED = False
 
 
@@ -108,7 +109,7 @@ def validate_android_variants(item: dict, path: str) -> None:
         variant_path = f"{path}.variants[{index}]"
         variant_tag = validate_artifact(variant, variant_path, require_signed=True)
         abi = variant.get("abi") if isinstance(variant, dict) else None
-        if abi not in ANDROID_ABIS:
+        if abi not in ANDROID_ABIS + ANDROID_OPTIONAL_ABIS:
             fail(f"{variant_path}.abi", "unsupported Android ABI")
         if abi in seen_abis:
             fail(f"{variant_path}.abi", "duplicate Android ABI")
@@ -120,8 +121,8 @@ def validate_android_variants(item: dict, path: str) -> None:
             fail(f"{variant_path}.url", "Android variant tag must match release tag")
         seen_abis.add(abi)
         seen_artifacts.add(variant["artifact"])
-    if seen_abis != set(ANDROID_ABIS):
-        fail(f"{path}.variants", "published Android candidate must list every released ABI exactly once")
+    if not set(ANDROID_ABIS).issubset(seen_abis):
+        fail(f"{path}.variants", "published Android candidate must list every required ABI exactly once")
     if item.get("artifact") not in seen_artifacts:
         fail(f"{path}.artifact", "primary Android artifact must also appear in variants")
 
@@ -211,6 +212,9 @@ def validate_release(item: object, platform: str, channel: str, path: str) -> No
     if platform == "android":
         if item.get("buildType") != "release" or not item.get("signed") or not artifact.endswith(".apk"):
             fail(path, "public Android artifact must be a signed release APK")
+        for flag in ("mobileTrialEnabled", "playIntegrityEnabled", "routeCatalogV1Enabled"):
+            if flag in item and not isinstance(item[flag], bool):
+                fail(f"{path}.{flag}", "must be a boolean")
         if channel == "beta":
             if item.get("prerelease") is not True or item.get("status") != "candidate":
                 fail(path, "Android beta must be marked as a release candidate prerelease")
