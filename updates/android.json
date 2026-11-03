@@ -5,18 +5,18 @@
   "channels": {
     "stable": null,
     "beta": {
-      "version": "0.2.12-rc.1",
+      "version": "0.2.13-rc.1",
       "published": true,
       "prerelease": true,
       "status": "candidate",
       "distribution": "github-release",
-      "tag": "android-v0.2.12-rc.1",
-      "releasePage": "https://github.com/ChekovDanil/temno-vpn-releases/releases/tag/android-v0.2.12-rc.1",
+      "tag": "android-v0.2.13-rc.1",
+      "releasePage": "https://github.com/ChekovDanil/temno-vpn-releases/releases/tag/android-v0.2.13-rc.1",
       "buildType": "release",
-      "artifact": "TEMNO-Android-0.2.12-arm64-v8a.apk",
-      "size": 85352524,
-      "sha256": "2ccefd15fe91ea34279f42bdeb595076c7cab545b4d5904c4fe1e83097896685",
-      "url": "https://github.com/ChekovDanil/temno-vpn-releases/releases/download/android-v0.2.12-rc.1/TEMNO-Android-0.2.12-arm64-v8a.apk",
+      "artifact": "TEMNO-Android-0.2.13-arm64-v8a.apk",
+      "size": 85352513,
+      "sha256": "d453fa26512db117a76a461d0c617c6b7fd51c0d124fd8ebd1fa5db0649c1c76",
+      "url": "https://github.com/ChekovDanil/temno-vpn-releases/releases/download/android-v0.2.13-rc.1/TEMNO-Android-0.2.13-arm64-v8a.apk",
       "signed": true,
       "automaticUpdate": false,
       "physicalDeviceTested": false,
@@ -26,26 +26,26 @@
       "variants": [
         {
           "abi": "arm64-v8a",
-          "artifact": "TEMNO-Android-0.2.12-arm64-v8a.apk",
-          "size": 85352524,
-          "sha256": "2ccefd15fe91ea34279f42bdeb595076c7cab545b4d5904c4fe1e83097896685",
-          "url": "https://github.com/ChekovDanil/temno-vpn-releases/releases/download/android-v0.2.12-rc.1/TEMNO-Android-0.2.12-arm64-v8a.apk",
+          "artifact": "TEMNO-Android-0.2.13-arm64-v8a.apk",
+          "size": 85352513,
+          "sha256": "d453fa26512db117a76a461d0c617c6b7fd51c0d124fd8ebd1fa5db0649c1c76",
+          "url": "https://github.com/ChekovDanil/temno-vpn-releases/releases/download/android-v0.2.13-rc.1/TEMNO-Android-0.2.13-arm64-v8a.apk",
           "signed": true
         },
         {
           "abi": "armeabi-v7a",
-          "artifact": "TEMNO-Android-0.2.12-armeabi-v7a.apk",
-          "size": 77338061,
-          "sha256": "4da5772e0a97a62a76df02f95c28956ec7383d416c930dec15914a31e67bec04",
-          "url": "https://github.com/ChekovDanil/temno-vpn-releases/releases/download/android-v0.2.12-rc.1/TEMNO-Android-0.2.12-armeabi-v7a.apk",
+          "artifact": "TEMNO-Android-0.2.13-armeabi-v7a.apk",
+          "size": 77338058,
+          "sha256": "de528ba6a3c45e29688b1b96026da821ab6b2c87522e4b46e7fa3ddf78cf3a01",
+          "url": "https://github.com/ChekovDanil/temno-vpn-releases/releases/download/android-v0.2.13-rc.1/TEMNO-Android-0.2.13-armeabi-v7a.apk",
           "signed": true
         },
         {
           "abi": "x86_64",
-          "artifact": "TEMNO-Android-0.2.12-x86_64.apk",
+          "artifact": "TEMNO-Android-0.2.13-x86_64.apk",
           "size": 89726149,
-          "sha256": "fb55757ec81163503db0cc85301f4f2117c80af2ec28e670839a117959f3e462",
-          "url": "https://github.com/ChekovDanil/temno-vpn-releases/releases/download/android-v0.2.12-rc.1/TEMNO-Android-0.2.12-x86_64.apk",
+          "sha256": "b9749f2e7f1032a57697a41abb839a906d3482c333c90d960c0c3ed59fad2f89",
+          "url": "https://github.com/ChekovDanil/temno-vpn-releases/releases/download/android-v0.2.13-rc.1/TEMNO-Android-0.2.13-x86_64.apk",
           "signed": true
         }
       ]
