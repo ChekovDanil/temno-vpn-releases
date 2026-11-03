@@ -85,11 +85,19 @@ class ReleaseCatalogTests(unittest.TestCase):
         self.assertTrue(item["prerelease"])
         self.assertFalse(item["automaticUpdate"])
         self.assertFalse(item["physicalDeviceTested"])
-        self.assertEqual({variant["abi"] for variant in item["variants"]}, set(catalog.ANDROID_ABIS))
+        self.assertFalse(item["mobileTrialEnabled"])
+        self.assertFalse(item["playIntegrityEnabled"])
+        self.assertTrue(item["routeCatalogV1Enabled"])
+        self.assertEqual({variant["abi"] for variant in item["variants"]}, set(catalog.ANDROID_ABIS + catalog.ANDROID_OPTIONAL_ABIS))
 
     def test_android_candidate_cannot_claim_automatic_updates(self):
         item = copy.deepcopy(self.latest["channels"]["beta"]["android"])
         item["automaticUpdate"] = True
+        self.assertRejected(item, "android")
+
+    def test_android_direct_flags_must_be_boolean(self):
+        item = copy.deepcopy(self.latest["channels"]["beta"]["android"])
+        item["mobileTrialEnabled"] = "false"
         self.assertRejected(item, "android")
 
     def test_android_candidate_rejects_unsigned_variant(self):
@@ -99,8 +107,13 @@ class ReleaseCatalogTests(unittest.TestCase):
 
     def test_android_candidate_requires_every_published_abi(self):
         item = copy.deepcopy(self.latest["channels"]["beta"]["android"])
-        item["variants"].pop()
+        item["variants"] = [variant for variant in item["variants"] if variant["abi"] != "armeabi-v7a"]
         self.assertRejected(item, "android")
+
+    def test_universal_apk_is_optional_for_older_catalogs(self):
+        item = copy.deepcopy(self.latest["channels"]["beta"]["android"])
+        item["variants"] = [variant for variant in item["variants"] if variant["abi"] != "universal"]
+        catalog.validate_release(item, "android", "beta", "fixture")
 
     def test_android_variant_cannot_point_to_another_tag(self):
         item = copy.deepcopy(self.latest["channels"]["beta"]["android"])
