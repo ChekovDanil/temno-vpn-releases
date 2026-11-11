@@ -61,6 +61,11 @@
         }
       ]
     },
-    "internal": null
+    "internal": null,
+    "googlePlay": {
+      "published": true,
+      "version": "0.2.16",
+      "versionCode": 23
+    }
   }
 }
